@@ -39,5 +39,6 @@ const validSignup = [
 
 ];
 
+
 module.exports = validSignup;
         

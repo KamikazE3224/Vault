@@ -1,5 +1,24 @@
-node_modules
-# Keep environment variables out of version control
-.env
+# OS X
+.DS_Store*
+Icon?
+._*
 
-/generated/prisma
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+*~
+
+
+# npm
+node_modules
+*.log
+*.gz
+
+
+# Coverage & Test Output
+coverage
+.nyc_output

@@ -14,14 +14,60 @@ async function postSignup(req,res){
                 return res.render('signup',{errors:errors.array()})
         }
 
-        const {email,password} = req.body;
+        const {fullName,email,password} = req.body;
         const hashedPassword = await bcrypt.hash(password,10);
 
-        await db.postDetails(email,hashedPassword);
-        res.render('login');
+        await db.postDetails(fullName,email,hashedPassword);
+        res.redirect('/log-in');
+}
+async function uploadFile(req, res) {
+    console.log(req.file);
+
+    res.redirect("/dashboard");
+}
+
+async function logOutUser(req,res,next){
+        res.logout((err)=>{
+                if(err){
+                        return next(err);
+                }
+                res.redirect('/');
+        })
+
+}
+
+async function logInUser(req, res, next)  {
+
+    console.log("LOGIN FORM:", req.body);
+
+    passport.authenticate('local', {
+        successRedirect: '/dashboard',
+        failureRedirect: '/log-in',
+        failureMessage: true
+    })(req, res, next);
+
+}
+async function loadDashboard(req, res){
+    console.log("DASHBOARD USER:", req.user);
+    res.render('dashboard', { user: req.user });
+}
+async function logInPage(req,res){
+        res.render('login')
+}
+
+async function postUploadFile(req,res,next){
+        if(!req.file){
+                return res.status(400).send('No file uploaded or file mismatch');
+        }
+        
 }
 
 module.exports = {
+        logInPage,
+        loadDashboard,
+        logInUser,
+        logOutUser,
         getSignupForm,
-        postSignup
+        postSignup,
+        uploadFile
 }

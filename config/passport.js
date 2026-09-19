@@ -1,62 +1,65 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcryptjs');
-const pgPool = require('../db/pool');
+const bcrypt = require('bcrypt');
+const db = require('../db/queries');
 
-passport.use(
-    new LocalStrategy(async (username, password, done) => {
-        try {
 
-            const { rows } = await pgPool.query(
-                'SELECT * FROM clubhouse_members WHERE username = $1',
-                [username]
-            );
+    passport.use(
+    new LocalStrategy(
+        {
+            usernameField: 'email'
+        },
+        async (email, password, done) => {
+            try {
+                const user = await db.getUserByIdentifier(email);
 
-            const user = rows[0];
+                if (!user) {
+                    return done(null, false, {
+                        message: 'User not found'
+                    });
+                }
 
-            if (!user) {
-                console.log('incorrect username');
-                return done(null, false, {
-                    message: 'user not found'
-                });
+                const match = await bcrypt.compare(
+                    password,
+                    user.password
+                );
+
+                console.log("PASSWORD MATCH:", match);
+
+                if (!match) {
+                    return done(null, false, {
+                        message: 'Incorrect password'
+                    });
+                }
+
+                console.log("LOGIN SUCCESS");
+
+                return done(null, user);
+
+            } catch (err) {
+                console.log("LOGIN ERROR:", err);
+                return done(err);
             }
-
-            const match = await bcrypt.compare(
-                password,
-                user.password
-            );
-
-            if (!match) {
-                console.log('incorrect password');
-
-                return done(null, false, {
-                    message: 'incorrect password'
-                });
-            }
-
-            return done(null, user);
-
-        } catch (err) {
-            return done(err);
         }
-    })
+    )
 );
 
-
 passport.serializeUser((user, done) => {
+    console.log("SERIALIZING USER:", user);
     done(null, user.id);
 });
 
-
 passport.deserializeUser(async (id, done) => {
     try {
+        console.log("DESERIALIZING USER ID:", id);
 
-        const { rows } = await pgPool.query(
-            'SELECT * FROM clubhouse_members WHERE id = $1',
-            [id]
-        );
+        const user = await db.getUserById(id);
 
-        const user = rows[0];
+        console.log("DESERIALIZED USER:", user);
+
+        if (!user) {
+            return done(null, false);
+        }
 
         done(null, user);
 
