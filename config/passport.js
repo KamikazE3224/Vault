@@ -45,17 +45,17 @@ const db = require('../db/queries');
 );
 
 passport.serializeUser((user, done) => {
-    console.log("SERIALIZING USER:", user);
+    //console.log("SERIALIZING USER:", user);
     done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
     try {
-        console.log("DESERIALIZING USER ID:", id);
+        //console.log("DESERIALIZING USER ID:", id);
 
         const user = await db.getUserById(id);
 
-        console.log("DESERIALIZED USER:", user);
+        //console.log("DESERIALIZED USER:", user);
 
         if (!user) {
             return done(null, false);

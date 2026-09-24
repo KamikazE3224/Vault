@@ -4,7 +4,11 @@ const indexController = require('../controller/indexController');
 const validateSignup = require('../middlware/formsValidation');
 const {isAuth,isGuest} = require('../middlware/authCheck');
 const passport = require('passport');
-const upload = require("../config/multer");
+const multer = require('multer');
+
+const upload = multer({
+    dest: 'uploads/'
+});
 
 indexRouter.get('/',isGuest,(req,res)=>{res.render('index');});
 
@@ -21,10 +25,7 @@ indexRouter.post(
     '/upload',
     isAuth,
     upload.single('uploadedFile'),
-    (req, res) => {
-        console.log(req.file);
-        res.send('Uploaded!');
-    }
+    indexController.uploadFile
 );
 
 
