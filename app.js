@@ -1,11 +1,15 @@
 const path = require('node:path');
 const express = require('express');
-const expressSession = require('express-session');
 
 
 const app = express();
 
 const indexRouter = require('./routes/indexRouter');
+
+
+
+app.set('views',path.join(__dirname,"views"));
+app.set('view engine','ejs');
 
 
 //------------------------------------Routers-----------------------------------------

@@ -5,7 +5,7 @@ const indexRouter = Router();
 
 indexRouter.get('/',(req,res)=>{
         console.log('index router hit');
-        //res.render('index');
+        res.render('index');
 })
 
 module.exports = indexRouter;
