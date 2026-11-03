@@ -1,16 +1,13 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
-const pgPool = require('../db/pool');
+const pgPool = require('../db/queries');
 
 passport.use(
-    new LocalStrategy(async (username, password, done) => {
+    new LocalStrategy(async (email, password, done) => {
         try {
 
-            const { rows } = await pgPool.query(
-                'SELECT * FROM clubhouse_members WHERE username = $1',
-                [username]
-            );
+            const { rows } = await pgPool.getUserByIdentifier(email);
 
             const user = rows[0];
 
@@ -42,22 +39,17 @@ passport.use(
     })
 );
 
-
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+        //console.log("SERIALIZING USER:", user);
+        done(null, user.id);
 });
-
 
 passport.deserializeUser(async (id, done) => {
     try {
-
-        const { rows } = await pgPool.query(
-            'SELECT * FROM clubhouse_members WHERE id = $1',
-            [id]
-        );
-
+        //console.log("DESERIALIZING USER ID:", id);
+        const { rows } = await pgPool.getUserById(id);//we
         const user = rows[0];
-
+        //console.log("DESERIALIZED USER:", user);
         done(null, user);
 
     } catch (err) {
