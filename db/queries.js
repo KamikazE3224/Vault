@@ -21,7 +21,17 @@ async function getUserById(id){
     });
 }
 
+async function SignUpUser(name,email,password){
+        const user = await prisma.user.create({
+                name:name,
+                email:email,
+                password:password
+        });
+        console.log("USER CREATED:", user);
+}
+
 module.exports = {
         getUserById,
-        getUserByIdentifier
+        getUserByIdentifier,
+        SignUpUser
 };
